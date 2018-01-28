@@ -18,7 +18,7 @@ object Plotly {
 
   private val printer = Printer.noSpaces.copy(dropNullKeys = true)
 
-  def jsSnippet(div: String, data: Seq[Trace], layout: Layout): String = {
+  def plotJsSnippet(div: String, data: Seq[Trace], layout: Layout): String = {
 
     val b = new StringBuilder
 
@@ -35,14 +35,17 @@ object Plotly {
     b ++= "\n"
     b ++= "  var layout = "
     b ++= printer.pretty(layout.asJson)
-    b ++= ";\n\n  Plotly.plot('"
+    b ++= ";\n\n  var p = Plotly.plot('"
     b ++= div.replaceAll("'", "\\'")
     b ++= "', data, layout);\n"
+    b ++= "  Promise.resolve(p);\n" //waits until chart is rendered
 
     b ++= "})();"
 
     b.result()
   }
+
+
 
   private def readFully(is: InputStream): Array[Byte] = {
     val buffer = new ByteArrayOutputStream()
@@ -58,7 +61,7 @@ object Plotly {
     buffer.toByteArray
   }
 
-  val plotlyVersion = "1.12.0" // FIXME Get from build.sbt
+  val plotlyVersion = "1.31.2" // FIXME Get from build.sbt
 
   def plotlyMinJs: String = {
     var is: InputStream = null
@@ -135,7 +138,7 @@ object Plotly {
          |<body>
          |<div id="$divId"></div>
          |<script>
-         |${jsSnippet(divId, traces, layout)}
+         |${plotJsSnippet(divId, traces, layout)}
          |</script>
          |</body>
          |</html>

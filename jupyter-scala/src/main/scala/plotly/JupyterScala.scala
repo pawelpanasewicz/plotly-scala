@@ -20,12 +20,13 @@ object JupyterScala {
        s"""define('plotly', function(require, exports, module) {
           |  ${Plotly.plotlyMinJs}
           |});
-        """
+        """.stripMargin
+
       else
-        """require.config({
+        s"""require.config({
           |  paths: {
           |    d3: 'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min',
-          |    plotly: 'https://cdn.plot.ly/plotly-1.12.0.min'
+          |    plotly: 'https://cdn.plot.ly/plotly-${Plotly.plotlyVersion}.min'
           |  },
           |
           |  shim: {
@@ -58,7 +59,7 @@ object JupyterScala {
     publish: Publish
   ): Unit = {
 
-    val baseJs = Plotly.jsSnippet(div, data, layout)
+    val baseJs = Plotly.plotJsSnippet(div, data, layout)
 
     val js =
      s"""requirejs(["plotly"], function(Plotly) {
